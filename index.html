@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Taskmaster Dashboard</title>
+</head>
+<body>
+<div class="dashboard-layout">
+
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h2>Taskmaster</h2>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item active" data-target="view-tasks">📝 Tasks</li>
+            <li class="nav-item" data-target="view-shop">🔓 Unlocks</li>
+            <li class="nav-item" data-target="view-stats">📊 Stats</li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+
+        <header class="top-bar">
+            <div class="stat-pill">
+                <span class="stat-label">Available Points:</span>
+                <span class="stat-value" id="points-earned">0</span>
+            </div>
+
+            <div class="progress-wrapper">
+                <div class="progress-track">
+                    <div id="progress-bar"></div>
+                </div>
+                <span id="progress-text">0.0% Complete</span>
+            </div>
+        </header>
+
+        <div class="content-container">
+
+            <section id="view-tasks" class="view-section active">
+                <div class="section-header">
+                    <h3>Available Tasks</h3>
+                </div>
+                <div class="task-filter-bar">
+                    <input type="text" id="task-search" placeholder="Search tasks..." onkeyup="filterTasks()">
+
+                    <select id="region-filter" onchange="filterTasks()">
+                        <option value="ALL">All Regions</option>
+                        <option value="GLOBAL">Global</option>
+                        <option value="ASGARNIA">Asgarnia</option>
+                        <option value="FREMENNIK_PROVINCE">Fremennik Province</option>
+                        <option value="GREAT_KOUREND">Great Kourend</option>
+                        <option value="KANDARIN">Kandarin</option>
+                        <option value="KARAMJA">Karamja</option>
+                        <option value="KHARIDIAN_DESERT">Kharidian Desert</option>
+                        <option value="MORYTANIA">Morytania</option>
+                        <option value="TIRANNWN">Tirannwn</option>
+                        <option value="VARLAMORE">Varlamore</option>
+                        <option value="WILDERNESS">Wilderness</option>
+                    </select>
+
+                    <select id="tier-filter" onchange="filterTasks()">
+                        <option value="ALL">All Tiers</option>
+                        <option value="EASY">Easy</option>
+                        <option value="MEDIUM">Medium</option>
+                        <option value="HARD">Hard</option>
+                        <option value="ELITE">Elite</option>
+                        <option value="MASTER">Master</option>
+                    </select>
+
+                    <select id="status-filter" onchange="filterTasks()">
+                        <option value="ALL">All Statuses</option>
+                        <option value="INCOMPLETE">Incomplete</option>
+                        <option value="IN-PROGRESS">In Progress</option>
+                        <option value="COMPLETED">Completed</option>
+                    </select>
+
+                    <select id="sort-filter" onchange="filterTasks()">
+                        <option value="DEFAULT">Default Sort</option>
+                        <option value="TIER_ASC">Tier (Easy to Master)</option>
+                        <option value="TIER_DESC">Tier (Master to Easy)</option>
+                        <option value="AZ">A-Z</option>
+                    </select>
+                    <button class="btn-reset" onclick="resetFilters()">Reset</button>
+                </div>
+                <div id="task-list" class="task-grid"></div>
+            </section>
+
+            <section id="view-shop" class="view-section">
+                <div class="section-header">
+                    <h3>Region & Perk Unlocks</h3>
+                </div>
+                <div class="placeholder-text">Shop data will populate here...</div>
+            </section>
+
+            <section id="view-stats" class="view-section">
+                <div class="section-header">
+                    <h3>Detailed Statistics</h3>
+                </div>
+                <div class="placeholder-text">Detailed breakdowns will populate here...</div>
+            </section>
+
+        </div>
+    </main>
+</div>
+
+<script src="app.js"></script>
+<div id="task-modal" class="modal-overlay" onclick="closeTaskDetails(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <div class="modal-title-group">
+                <img id="modal-icon" src="" alt="Task Icon" class="task-icon" />
+                <h3 id="modal-title">Task Name</h3>
+            </div>
+            <button class="btn-close" onclick="closeTaskDetails()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-tags">
+                <span id="modal-region" class="meta-tag">Region</span>
+                <span id="modal-tier" class="meta-tag">Tier</span>
+            </div>
+            <p id="modal-desc" class="modal-description">Task description goes here...</p>
+
+            <div id="modal-progress-container" class="modal-progress-container">
+            </div>
+
+            <div id="modal-requirements" class="modal-requirements">
+            </div>
+        </div>
+        <div class="modal-footer" id="modal-footer">
+        </div>
+    </div>
+</div>
+</body>
+</html>
