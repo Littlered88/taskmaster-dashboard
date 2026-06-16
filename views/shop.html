@@ -1,0 +1,40 @@
+<div class="section-header">
+  <h3>Region & Perk Unlocks</h3>
+</div>
+
+<div class="points-bar">
+  <div class="points-card available">
+    <div class="label">Available Points</div>
+    <div class="value" id="shop-points-available">0</div>
+  </div>
+  <div class="points-card regions">
+    <div class="label">Regions Owned</div>
+    <div class="value" id="shop-regions-owned">0 / 0</div>
+  </div>
+</div>
+
+<div class="shop-search-bar">
+  <input type="text" id="shop-search" placeholder="Search all unlocks..." onkeyup="handleShopSearch()" />
+</div>
+
+<div class="shop-tabs" id="shop-tabs">
+  <!-- Populated by app.js: Regions & Oceans, Shops, Guilds, Bosses, etc. -->
+</div>
+
+<div class="shop-controls-bar">
+  <div class="shop-filter-bar" id="shop-filter-bar">
+    <!-- Populated by app.js based on the active category's filter config -->
+  </div>
+  <select id="shop-sort" class="shop-filter-select" onchange="handleShopSortChange(this)">
+    <option value="AZ">A-Z</option>
+    <option value="ZA">Z-A</option>
+    <option value="PRICE_LOW_HIGH">Price: Low to High</option>
+    <option value="PRICE_HIGH_LOW">Price: High to Low</option>
+    <option value="REGION">By Region</option>
+    <option value="AFFORDABLE_FIRST">Affordable First</option>
+  </select>
+</div>
+
+<div id="shop-content">
+  <!-- Populated by app.js based on active tab, or search results -->
+</div>

@@ -1,0 +1,70 @@
+<div class="section-header">
+  <h3>Available Tasks</h3>
+</div>
+
+<div class="summary-bar">
+  <div class="summary-card points">
+    <div class="label">Available Points</div>
+    <div class="value" id="tasks-points-value">0</div>
+    <div class="sub">To spend on unlocks</div>
+  </div>
+  <div class="summary-card tasks">
+    <div class="label">Tasks Completed</div>
+    <div class="value" id="tasks-completed-value">0 / 0</div>
+    <div class="sub" id="tasks-completed-sub">0% overall</div>
+  </div>
+  <div class="summary-card progress">
+    <div class="label">In Progress</div>
+    <div class="value" id="tasks-in-progress-value">0</div>
+    <div class="sub">Tasks with partial progress</div>
+  </div>
+  <div class="summary-card next">
+    <div class="label">Closest to Completion</div>
+    <div class="value" id="tasks-closest-value">—</div>
+    <div class="sub" id="tasks-closest-sub">—</div>
+  </div>
+</div>
+
+<div class="task-filter-bar">
+  <input type="text" id="task-search" placeholder="Search tasks..." onkeyup="filterTasks()" />
+
+  <select id="region-filter" onchange="filterTasks()">
+    <option value="ALL">All Regions</option>
+    <option value="GLOBAL">Global</option>
+    <option value="ASGARNIA">Asgarnia</option>
+    <option value="FREMENNIK_PROVINCE">Fremennik Province</option>
+    <option value="GREAT_KOUREND">Great Kourend</option>
+    <option value="KANDARIN">Kandarin</option>
+    <option value="KARAMJA">Karamja</option>
+    <option value="KHARIDIAN_DESERT">Kharidian Desert</option>
+    <option value="MORYTANIA">Morytania</option>
+    <option value="TIRANNWN">Tirannwn</option>
+    <option value="VARLAMORE">Varlamore</option>
+    <option value="WILDERNESS">Wilderness</option>
+  </select>
+
+  <select id="tier-filter" onchange="filterTasks()">
+    <option value="ALL">All Tiers</option>
+    <option value="EASY">Easy</option>
+    <option value="MEDIUM">Medium</option>
+    <option value="HARD">Hard</option>
+    <option value="ELITE">Elite</option>
+    <option value="MASTER">Master</option>
+  </select>
+
+  <select id="status-filter" onchange="filterTasks()">
+    <option value="ALL">All Statuses</option>
+    <option value="INCOMPLETE">Incomplete</option>
+    <option value="IN-PROGRESS">In Progress</option>
+    <option value="COMPLETED">Completed</option>
+  </select>
+
+  <select id="sort-filter" onchange="filterTasks()">
+    <option value="DEFAULT">Default Sort</option>
+    <option value="TIER_ASC">Tier (Easy to Master)</option>
+    <option value="TIER_DESC">Tier (Master to Easy)</option>
+    <option value="AZ">A-Z</option>
+  </select>
+  <button class="btn-reset" onclick="resetFilters()">Reset</button>
+</div>
+<div id="task-list" class="task-grid"></div>
