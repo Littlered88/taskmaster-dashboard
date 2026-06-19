@@ -108,6 +108,20 @@ async function loadViews() {
   viewsReady = true;
   document.body.classList.add("loaded");
 
+  const taskSearch = sessionStorage.getItem("tm_task_search");
+  const taskRegion = sessionStorage.getItem("tm_task_region");
+  const taskTier = sessionStorage.getItem("tm_task_tier");
+  const taskStatus = sessionStorage.getItem("tm_task_status");
+  const taskSort = sessionStorage.getItem("tm_task_sort");
+  if (taskSearch !== null) document.getElementById("task-search").value = taskSearch;
+  if (taskRegion !== null) document.getElementById("region-filter").value = taskRegion;
+  if (taskTier !== null) document.getElementById("tier-filter").value = taskTier;
+  if (taskStatus !== null) document.getElementById("status-filter").value = taskStatus;
+  if (taskSort !== null) document.getElementById("sort-filter").value = taskSort;
+
+  // Re-attach nav click handlers now the sections exist
+  attachNavHandlers();
+
   // Re-attach nav click handlers now the sections exist
   attachNavHandlers();
 
@@ -359,6 +373,12 @@ function filterTasks() {
   const statusFilter = document.getElementById("status-filter").value;
   const sortOrder = document.getElementById("sort-filter").value;
 
+  sessionStorage.setItem("tm_task_search", searchTerm);
+  sessionStorage.setItem("tm_task_region", regionFilter);
+  sessionStorage.setItem("tm_task_tier", tierFilter);
+  sessionStorage.setItem("tm_task_status", statusFilter);
+  sessionStorage.setItem("tm_task_sort", sortOrder);
+
   // 1. Filter the cached global list
   let filtered = globalTaskList.filter((task) => {
     // ALWAYS return pinned tasks, bypassing all filters
@@ -429,6 +449,12 @@ function resetFilters() {
   document.getElementById("tier-filter").value = "ALL";
   document.getElementById("status-filter").value = "ALL";
   document.getElementById("sort-filter").value = "DEFAULT";
+
+  sessionStorage.removeItem("tm_task_search");
+  sessionStorage.removeItem("tm_task_region");
+  sessionStorage.removeItem("tm_task_tier");
+  sessionStorage.removeItem("tm_task_status");
+  sessionStorage.removeItem("tm_task_sort");
 
   // Re-run the filter logic to update the dashboard
   filterTasks();
