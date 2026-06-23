@@ -1,0 +1,432 @@
+{
+  "ASGARNIA": {
+    "quests": [],
+    "settlements": [],
+    "bosses": [],
+    "skilling": [],
+    "npcs": [],
+    "drops": [],
+    "shops": [],
+    "unlocks": [],
+    "tasks": {
+      "Easy": {
+        "count": 12,
+        "points": 120
+      },
+      "Medium": {
+        "count": 35,
+        "points": 1750
+      },
+      "Hard": {
+        "count": 31,
+        "points": 4650
+      },
+      "Elite": {
+        "count": 27,
+        "points": 6750
+      },
+      "Master": {
+        "count": 1,
+        "points": 500
+      }
+    }
+  },
+  "KANDARIN": {
+    "quests": [],
+    "settlements": [],
+    "bosses": [],
+    "skilling": [],
+    "npcs": [],
+    "drops": [],
+    "shops": [],
+    "unlocks": [],
+    "tasks": {
+      "Easy": {
+        "count": 12,
+        "points": 120
+      },
+      "Medium": {
+        "count": 21,
+        "points": 1050
+      },
+      "Hard": {
+        "count": 10,
+        "points": 1500
+      },
+      "Elite": {
+        "count": 10,
+        "points": 2500
+      },
+      "Master": {
+        "count": 2,
+        "points": 1000
+      }
+    }
+  },
+  "MORYTANIA": {
+    "quests": [],
+    "settlements": [],
+    "bosses": [],
+    "skilling": [],
+    "npcs": [],
+    "drops": [],
+    "shops": [],
+    "unlocks": [],
+    "tasks": {
+      "Easy": {
+        "count": 9,
+        "points": 90
+      },
+      "Medium": {
+        "count": 31,
+        "points": 1550
+      },
+      "Hard": {
+        "count": 34,
+        "points": 5100
+      },
+      "Elite": {
+        "count": 24,
+        "points": 6000
+      },
+      "Master": {
+        "count": 5,
+        "points": 2500
+      }
+    }
+  },
+  "KHARIDIAN_DESERT": {
+    "quests": [],
+    "settlements": [],
+    "bosses": [],
+    "skilling": [],
+    "npcs": [],
+    "drops": [],
+    "shops": [],
+    "unlocks": [],
+    "tasks": {
+      "Easy": {
+        "count": 15,
+        "points": 150
+      },
+      "Medium": {
+        "count": 39,
+        "points": 1950
+      },
+      "Hard": {
+        "count": 39,
+        "points": 5850
+      },
+      "Elite": {
+        "count": 20,
+        "points": 5000
+      },
+      "Master": {
+        "count": 4,
+        "points": 2000
+      }
+    }
+  },
+  "FREMENNIK_PROVINCE": {
+    "quests": [],
+    "settlements": [],
+    "bosses": [],
+    "skilling": [],
+    "npcs": [],
+    "drops": [],
+    "shops": [],
+    "unlocks": [],
+    "tasks": {
+      "Easy": {
+        "count": 15,
+        "points": 150
+      },
+      "Medium": {
+        "count": 30,
+        "points": 1500
+      },
+      "Hard": {
+        "count": 43,
+        "points": 6450
+      },
+      "Elite": {
+        "count": 24,
+        "points": 6000
+      },
+      "Master": {
+        "count": 1,
+        "points": 500
+      }
+    }
+  },
+  "GREAT_KOUREND": {
+    "quests": [],
+    "settlements": [],
+    "bosses": [],
+    "skilling": [],
+    "npcs": [],
+    "drops": [],
+    "shops": [],
+    "unlocks": [],
+    "tasks": {
+      "Easy": {
+        "count": 14,
+        "points": 140
+      },
+      "Medium": {
+        "count": 38,
+        "points": 1900
+      },
+      "Hard": {
+        "count": 40,
+        "points": 6000
+      },
+      "Elite": {
+        "count": 29,
+        "points": 7250
+      },
+      "Master": {
+        "count": 3,
+        "points": 1500
+      }
+    }
+  },
+  "VARLAMORE": {
+    "quests": [],
+    "settlements": [],
+    "bosses": [],
+    "skilling": [],
+    "npcs": [],
+    "drops": [],
+    "shops": [],
+    "unlocks": [],
+    "tasks": {
+      "Easy": {
+        "count": 38,
+        "points": 380
+      },
+      "Medium": {
+        "count": 58,
+        "points": 2900
+      },
+      "Hard": {
+        "count": 43,
+        "points": 6450
+      },
+      "Elite": {
+        "count": 22,
+        "points": 5500
+      },
+      "Master": {
+        "count": 4,
+        "points": 2000
+      }
+    }
+  },
+  "WILDERNESS": {
+    "quests": [],
+    "settlements": [],
+    "bosses": [],
+    "skilling": [],
+    "npcs": [],
+    "drops": [],
+    "shops": [],
+    "unlocks": [],
+    "tasks": {
+      "Easy": {
+        "count": 12,
+        "points": 120
+      },
+      "Medium": {
+        "count": 24,
+        "points": 1200
+      },
+      "Hard": {
+        "count": 37,
+        "points": 5550
+      },
+      "Elite": {
+        "count": 25,
+        "points": 6250
+      },
+      "Master": {
+        "count": 3,
+        "points": 1500
+      }
+    }
+  },
+  "TIRANNWN": {
+    "quests": [],
+    "settlements": [],
+    "bosses": [],
+    "skilling": [],
+    "npcs": [],
+    "drops": [],
+    "shops": [],
+    "unlocks": [],
+    "tasks": {
+      "Easy": {
+        "count": 6,
+        "points": 60
+      },
+      "Medium": {
+        "count": 14,
+        "points": 700
+      },
+      "Hard": {
+        "count": 39,
+        "points": 5850
+      },
+      "Elite": {
+        "count": 28,
+        "points": 7000
+      },
+      "Master": {
+        "count": 2,
+        "points": 1000
+      }
+    }
+  },
+  "MISTHALIN": {
+    "quests": [],
+    "settlements": [],
+    "bosses": [],
+    "skilling": [],
+    "npcs": [],
+    "drops": [],
+    "shops": [],
+    "unlocks": [],
+    "tasks": {}
+  },
+  "KARAMJA": {
+    "quests": [],
+    "settlements": [],
+    "bosses": [],
+    "skilling": [],
+    "npcs": [],
+    "drops": [],
+    "shops": [],
+    "unlocks": [],
+    "tasks": {
+      "Easy": {
+        "count": 5,
+        "points": 50
+      },
+      "Medium": {
+        "count": 23,
+        "points": 1150
+      },
+      "Hard": {
+        "count": 8,
+        "points": 1200
+      },
+      "Elite": {
+        "count": 11,
+        "points": 2750
+      },
+      "Master": {
+        "count": 6,
+        "points": 3000
+      }
+    }
+  },
+  "SUNSET_OCEAN": {
+    "quests": [],
+    "settlements": [],
+    "bosses": [],
+    "skilling": [],
+    "npcs": [],
+    "drops": [],
+    "shops": [],
+    "unlocks": [],
+    "tasks": {}
+  },
+  "FORGOTTEN_OCEAN": {
+    "quests": [],
+    "settlements": [],
+    "bosses": [],
+    "skilling": [],
+    "npcs": [],
+    "drops": [],
+    "shops": [],
+    "unlocks": [],
+    "tasks": {}
+  },
+  "WESTERN_OCEAN": {
+    "quests": [],
+    "settlements": [],
+    "bosses": [],
+    "skilling": [],
+    "npcs": [],
+    "drops": [],
+    "shops": [],
+    "unlocks": [],
+    "tasks": {}
+  },
+  "NORTHERN_OCEAN": {
+    "quests": [],
+    "settlements": [],
+    "bosses": [],
+    "skilling": [],
+    "npcs": [],
+    "drops": [],
+    "shops": [],
+    "unlocks": [],
+    "tasks": {}
+  },
+  "SHROUDED_OCEAN": {
+    "quests": [],
+    "settlements": [],
+    "bosses": [],
+    "skilling": [],
+    "npcs": [],
+    "drops": [],
+    "shops": [],
+    "unlocks": [],
+    "tasks": {}
+  },
+  "ARDENT_OCEAN": {
+    "quests": [],
+    "settlements": [],
+    "bosses": [],
+    "skilling": [],
+    "npcs": [],
+    "drops": [],
+    "shops": [],
+    "unlocks": [],
+    "tasks": {}
+  },
+  "UNQUIET_OCEAN": {
+    "quests": [],
+    "settlements": [],
+    "bosses": [],
+    "skilling": [],
+    "npcs": [],
+    "drops": [],
+    "shops": [],
+    "unlocks": [],
+    "tasks": {}
+  },
+  "EASTERN_OCEAN": {
+    "quests": [],
+    "settlements": [],
+    "bosses": [],
+    "skilling": [],
+    "npcs": [],
+    "drops": [],
+    "shops": [],
+    "unlocks": [],
+    "tasks": {}
+  },
+  "UNTAMED_OCEAN": {
+    "quests": [],
+    "settlements": [],
+    "bosses": [],
+    "skilling": [],
+    "npcs": [],
+    "drops": [],
+    "shops": [],
+    "unlocks": [],
+    "tasks": {}
+  }
+}

@@ -45,6 +45,7 @@ let globalOwnedPerkIds = new Set();
 let globalOwnedRegionIds = new Set();
 let globalAvailablePoints = 0;
 let activeShopTab = "REGIONS";
+let globalRegionInfo = {};
 
 // Tracks whether view fragments have finished loading and are in the DOM.
 // The WebSocket can receive data before fragments finish fetching — and
@@ -104,6 +105,13 @@ async function loadViews() {
   });
 
   await Promise.all(fetches);
+
+  fetch("region_info.json")
+    .then((r) => r.json())
+    .then((data) => {
+      globalRegionInfo = data;
+    })
+    .catch(() => {});
 
   viewsReady = true;
   document.body.classList.add("loaded");
@@ -1138,10 +1146,10 @@ function renderRegionsTab(container) {
   container.innerHTML = `
     <div class="region-map-layout">
       <div class="region-map-svg-container">
+        ${REGION_MAP_SVG}
         <div class="region-hover-label">
           <span class="region-hover-label-text" id="region-hover-label-text"></span>
         </div>
-        ${REGION_MAP_SVG}
       </div>
       <div class="region-info-panel" id="region-info-panel">
         <div class="region-info-empty" id="region-info-empty">
@@ -1150,20 +1158,26 @@ function renderRegionsTab(container) {
         <div id="region-info-content" style="display:none">
           <div class="region-info-accent" id="region-info-accent"></div>
           <h3 class="region-info-name" id="region-info-name"></h3>
-          <p class="region-info-desc" id="region-info-desc">
-            Placeholder description — region descriptions will be added to the data in a future update.
-          </p>
-          <div class="region-info-stats">
-            <div class="region-info-stat">
-              <div class="region-info-stat-label">Unlock Cost</div>
-              <div class="region-info-stat-value" id="region-info-cost">—</div>
+          <div class="region-info-pills" id="region-info-pills"></div>
+          <div class="region-info-cost-row">
+            <div>
+              <div class="region-info-stat-label">Unlock cost</div>
+              <div class="region-info-cost-value" id="region-info-cost">—</div>
             </div>
-            <div class="region-info-stat">
+            <div style="text-align:right">
               <div class="region-info-stat-label">Available</div>
               <div class="region-info-stat-value" id="region-info-points">—</div>
             </div>
           </div>
           <button class="region-info-btn" id="region-info-btn">Unlock Region</button>
+          <div class="region-info-tabs">
+            <div class="region-info-tab active" onclick="switchRegionTab(this,'overview')">Overview</div>
+            <div class="region-info-tab" onclick="switchRegionTab(this,'content')">Content</div>
+            <div class="region-info-tab" onclick="switchRegionTab(this,'unlocks')">Unlocks</div>
+          </div>
+          <div class="region-info-tab-body" id="region-tab-overview"></div>
+          <div class="region-info-tab-body" id="region-tab-content" style="display:none"></div>
+          <div class="region-info-tab-body" id="region-tab-unlocks" style="display:none"></div>
         </div>
       </div>
     </div>
@@ -1227,25 +1241,43 @@ function showRegionInfo(el) {
   const entry = globalUnlockCatalogue.find((u) => u.id === catalogueId);
   const cost = entry ? entry.cost : 0;
   const canAfford = globalAvailablePoints >= cost;
+  const info = globalRegionInfo[catalogueId] || {};
 
   document.getElementById("region-info-empty").style.display = "none";
-  document.getElementById("region-info-content").style.display = "block";
+  const content = document.getElementById("region-info-content");
+  content.style.display = "block";
+  content.style.setProperty("--rc", rc); // drives active tab colour
+
   document.getElementById("region-info-accent").style.background = rc;
   document.getElementById("region-info-name").textContent = name;
   document.getElementById("region-info-cost").textContent =
     cost > 0 ? cost.toLocaleString() + " pts" : "Starting region";
   document.getElementById("region-info-points").textContent = globalAvailablePoints.toLocaleString() + " pts";
 
+  // Quick stat pills
+  const pills = [];
+  if (info.tasks && Object.keys(info.tasks).length) {
+    const totalTasks = Object.values(info.tasks).reduce((s, t) => s + t.count, 0);
+    const totalPts = Object.values(info.tasks).reduce((s, t) => s + t.points, 0);
+    pills.push(`${totalTasks} tasks`);
+    pills.push(`${Math.round(totalPts / 1000)}k pts`);
+  }
+  if (info.quests && info.quests.length) pills.push(`${info.quests.length} quests`);
+  if (info.bosses && info.bosses.length) pills.push(`${info.bosses.length} bosses`);
+  document.getElementById("region-info-pills").innerHTML = pills
+    .map((p) => `<span class="region-info-pill">${p}</span>`)
+    .join("");
+
+  // Unlock button
   const btn = document.getElementById("region-info-btn");
   btn.style.cssText = "";
-  btn.style.setProperty("--rc", rc);
   btn.className = "region-info-btn";
   btn.onclick = null;
-
   if (unlocked) {
     btn.textContent = "✓ Already Unlocked";
     btn.disabled = true;
     btn.classList.add("is-unlocked");
+    btn.style.setProperty("--rc", rc);
   } else if (!canAfford) {
     btn.textContent = "Cannot afford — " + cost.toLocaleString() + " pts needed";
     btn.disabled = true;
@@ -1257,6 +1289,90 @@ function showRegionInfo(el) {
     btn.style.color = "#fff";
     btn.onclick = () => sendPurchaseUnlock(catalogueId);
   }
+
+  // Reset to overview tab
+  const firstTab = document.querySelector(".region-info-tab");
+  if (firstTab) switchRegionTab(firstTab, "overview");
+
+  // Overview tab
+  const ov = [];
+  if (info.tasks && Object.keys(info.tasks).length) ov.push(buildDistributionBar(info.tasks));
+  if (info.settlements && info.settlements.length) ov.push(buildTagSection("Settlements", info.settlements));
+  if (info.quests && info.quests.length) ov.push(buildTagSection("Completable quests", info.quests, "quest"));
+  if (info.npcs && info.npcs.length) ov.push(buildTagSection("Notable NPCs", info.npcs));
+  if (!ov.length) ov.push('<p class="region-info-placeholder">No overview data available yet.</p>');
+  document.getElementById("region-tab-overview").innerHTML = ov.join("");
+
+  // Content tab
+  const ct = [];
+  if (info.bosses && info.bosses.length) ct.push(buildTagSection("Bosses", info.bosses, "boss"));
+  if (info.skilling && info.skilling.length) ct.push(buildTagSection("Skilling activities", info.skilling, "skill"));
+  if (info.drops && info.drops.length) ct.push(buildTagSection("Notable drops", info.drops));
+  if (!ct.length) ct.push('<p class="region-info-placeholder">No content data available yet.</p>');
+  document.getElementById("region-tab-content").innerHTML = ct.join("");
+
+  // Unlocks tab
+  const ul = [];
+  if (info.shops && info.shops.length) ul.push(buildTagSection("Shops & guilds", info.shops));
+  if (info.unlocks && info.unlocks.length) ul.push(buildTagSection("Notable unlocks", info.unlocks));
+  if (!ul.length) ul.push('<p class="region-info-placeholder">No unlock data available yet.</p>');
+  document.getElementById("region-tab-unlocks").innerHTML = ul.join("");
+}
+
+function switchRegionTab(el, tabId) {
+  document.querySelectorAll(".region-info-tab").forEach((t) => t.classList.remove("active"));
+  if (el) el.classList.add("active");
+  ["overview", "content", "unlocks"].forEach((id) => {
+    const body = document.getElementById("region-tab-" + id);
+    if (body) body.style.display = id === tabId ? "block" : "none";
+  });
+}
+
+function buildTagSection(title, items, cls) {
+  const tags = items.map((item) => `<span class="region-tag${cls ? " " + cls : ""}">${item}</span>`).join("");
+  return `<div class="region-info-section">
+    <div class="region-info-section-label">${title}</div>
+    <div class="region-tag-list">${tags}</div>
+  </div>`;
+}
+
+function buildDistributionBar(tasks) {
+  const tiers = [
+    { key: "Easy", color: "#1e8449" },
+    { key: "Medium", color: "#2471a3" },
+    { key: "Hard", color: "#d4a017" },
+    { key: "Elite", color: "#c0395a" },
+    { key: "Master", color: "#6c3483" },
+  ];
+  const total = Object.values(tasks).reduce((s, t) => s + t.count, 0);
+  if (!total) return "";
+
+  const segs = tiers
+    .filter((t) => tasks[t.key])
+    .map((t) => {
+      const pct = (tasks[t.key].count / total) * 100;
+      const label = pct > 12 ? Math.round(pct) + "%" : "";
+      const tip = `${t.key}: ${tasks[t.key].count} tasks · ${tasks[t.key].points.toLocaleString()} pts · ${pct.toFixed(1)}%`;
+      return `<div class="region-dist-seg" style="width:${pct}%;background:${t.color}" title="${tip}">${label}</div>`;
+    })
+    .join("");
+
+  const legend = tiers
+    .filter((t) => tasks[t.key])
+    .map(
+      (t) =>
+        `<div class="region-dist-leg-item">
+          <span class="region-dist-dot" style="background:${t.color}"></span>
+          ${t.key} <strong>${tasks[t.key].count}</strong>
+        </div>`,
+    )
+    .join("");
+
+  return `<div class="region-info-section">
+    <div class="region-info-section-label">Task distribution</div>
+    <div class="region-dist-bar">${segs}</div>
+    <div class="region-dist-legend">${legend}</div>
+  </div>`;
 }
 
 function closeRegionModal() {
