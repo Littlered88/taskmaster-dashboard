@@ -1,34 +1,82 @@
 {
   "ASGARNIA": {
-    "quests": [],
-    "settlements": [],
-    "bosses": [],
-    "skilling": [],
-    "npcs": [],
-    "drops": [],
-    "shops": [],
-    "unlocks": [],
-    "tasks": {
-      "Easy": {
-        "count": 12,
-        "points": 120
-      },
-      "Medium": {
-        "count": 35,
-        "points": 1750
-      },
-      "Hard": {
-        "count": 31,
-        "points": 4650
-      },
-      "Elite": {
-        "count": 27,
-        "points": 6750
-      },
-      "Master": {
-        "count": 1,
-        "points": 500
-      }
+    "quests": {
+      "wikiLinks": true,
+      "items": [
+        "Black Knights' Fortress"
+      ]
+    },
+    "settlements": {
+      "wikiLinks": true,
+      "items": [
+        "Falador",
+        "Burthorpe",
+        "Port Sarim",
+        "Rimmington",
+        "Taverley"
+      ]
+    },
+    "bosses": {
+      "wikiLinks": true,
+      "items": [
+        "Cerberus",
+        "Kree'Arra",
+        "General Graardor",
+        "Commander Zilyana",
+        "K'ril Tsutsaroth",
+        "Nex",
+        "The Whisperer",
+        "The Giant Mole",
+        "Royal Titans"
+      ]
+    },
+    "skilling": {
+      "wikiLinks": true,
+      "items": [
+        "Dwarven Mine",
+        {
+          "name": "Falador Rooftop Agility",
+          "url": "https://oldschool.runescape.wiki/w/Falador_Rooftop_Course"
+        },
+        {
+          "name": "Allotment Patches",
+          "url": "https://oldschool.runescape.wiki/w/Allotment_patch#Allotment_patches"
+        },
+        "Herb patches",
+        "Flower patch",
+        "Tree patch"
+      ]
+    },
+    "npcs": {
+      "wikiLinks": true,
+      "items": [
+        "Wyson"
+      ]
+    },
+    "drops": {
+      "wikiLinks": true,
+      "items": [
+        "Dragon Boots",
+        "Draconic Visage",
+        "Smouldering Stone",
+        "Defenders"
+      ]
+    },
+    "shops": {
+      "wikiLinks": true,
+      "items": [
+        "Betty's Magic Emporium",
+        "Brian's Battleaxe Bazaar",
+        "Gerrant's Fishy Business",
+        "Wydin's Food Store"
+      ]
+    },
+    "unlocks": {
+      "wikiLinks": true,
+      "items": [
+        "Mining Guild",
+        "Crafting Guild"
+      ]
     }
   },
   "KANDARIN": {
@@ -39,29 +87,7 @@
     "npcs": [],
     "drops": [],
     "shops": [],
-    "unlocks": [],
-    "tasks": {
-      "Easy": {
-        "count": 12,
-        "points": 120
-      },
-      "Medium": {
-        "count": 21,
-        "points": 1050
-      },
-      "Hard": {
-        "count": 10,
-        "points": 1500
-      },
-      "Elite": {
-        "count": 10,
-        "points": 2500
-      },
-      "Master": {
-        "count": 2,
-        "points": 1000
-      }
-    }
+    "unlocks": []
   },
   "MORYTANIA": {
     "quests": [],
@@ -71,29 +97,7 @@
     "npcs": [],
     "drops": [],
     "shops": [],
-    "unlocks": [],
-    "tasks": {
-      "Easy": {
-        "count": 9,
-        "points": 90
-      },
-      "Medium": {
-        "count": 31,
-        "points": 1550
-      },
-      "Hard": {
-        "count": 34,
-        "points": 5100
-      },
-      "Elite": {
-        "count": 24,
-        "points": 6000
-      },
-      "Master": {
-        "count": 5,
-        "points": 2500
-      }
-    }
+    "unlocks": []
   },
   "KHARIDIAN_DESERT": {
     "quests": [],
@@ -103,29 +107,7 @@
     "npcs": [],
     "drops": [],
     "shops": [],
-    "unlocks": [],
-    "tasks": {
-      "Easy": {
-        "count": 15,
-        "points": 150
-      },
-      "Medium": {
-        "count": 39,
-        "points": 1950
-      },
-      "Hard": {
-        "count": 39,
-        "points": 5850
-      },
-      "Elite": {
-        "count": 20,
-        "points": 5000
-      },
-      "Master": {
-        "count": 4,
-        "points": 2000
-      }
-    }
+    "unlocks": []
   },
   "FREMENNIK_PROVINCE": {
     "quests": [],
@@ -135,29 +117,7 @@
     "npcs": [],
     "drops": [],
     "shops": [],
-    "unlocks": [],
-    "tasks": {
-      "Easy": {
-        "count": 15,
-        "points": 150
-      },
-      "Medium": {
-        "count": 30,
-        "points": 1500
-      },
-      "Hard": {
-        "count": 43,
-        "points": 6450
-      },
-      "Elite": {
-        "count": 24,
-        "points": 6000
-      },
-      "Master": {
-        "count": 1,
-        "points": 500
-      }
-    }
+    "unlocks": []
   },
   "GREAT_KOUREND": {
     "quests": [],
@@ -167,29 +127,7 @@
     "npcs": [],
     "drops": [],
     "shops": [],
-    "unlocks": [],
-    "tasks": {
-      "Easy": {
-        "count": 14,
-        "points": 140
-      },
-      "Medium": {
-        "count": 38,
-        "points": 1900
-      },
-      "Hard": {
-        "count": 40,
-        "points": 6000
-      },
-      "Elite": {
-        "count": 29,
-        "points": 7250
-      },
-      "Master": {
-        "count": 3,
-        "points": 1500
-      }
-    }
+    "unlocks": []
   },
   "VARLAMORE": {
     "quests": [],
@@ -199,29 +137,7 @@
     "npcs": [],
     "drops": [],
     "shops": [],
-    "unlocks": [],
-    "tasks": {
-      "Easy": {
-        "count": 38,
-        "points": 380
-      },
-      "Medium": {
-        "count": 58,
-        "points": 2900
-      },
-      "Hard": {
-        "count": 43,
-        "points": 6450
-      },
-      "Elite": {
-        "count": 22,
-        "points": 5500
-      },
-      "Master": {
-        "count": 4,
-        "points": 2000
-      }
-    }
+    "unlocks": []
   },
   "WILDERNESS": {
     "quests": [],
@@ -231,29 +147,7 @@
     "npcs": [],
     "drops": [],
     "shops": [],
-    "unlocks": [],
-    "tasks": {
-      "Easy": {
-        "count": 12,
-        "points": 120
-      },
-      "Medium": {
-        "count": 24,
-        "points": 1200
-      },
-      "Hard": {
-        "count": 37,
-        "points": 5550
-      },
-      "Elite": {
-        "count": 25,
-        "points": 6250
-      },
-      "Master": {
-        "count": 3,
-        "points": 1500
-      }
-    }
+    "unlocks": []
   },
   "TIRANNWN": {
     "quests": [],
@@ -263,29 +157,7 @@
     "npcs": [],
     "drops": [],
     "shops": [],
-    "unlocks": [],
-    "tasks": {
-      "Easy": {
-        "count": 6,
-        "points": 60
-      },
-      "Medium": {
-        "count": 14,
-        "points": 700
-      },
-      "Hard": {
-        "count": 39,
-        "points": 5850
-      },
-      "Elite": {
-        "count": 28,
-        "points": 7000
-      },
-      "Master": {
-        "count": 2,
-        "points": 1000
-      }
-    }
+    "unlocks": []
   },
   "MISTHALIN": {
     "quests": [],
@@ -295,8 +167,7 @@
     "npcs": [],
     "drops": [],
     "shops": [],
-    "unlocks": [],
-    "tasks": {}
+    "unlocks": []
   },
   "KARAMJA": {
     "quests": [],
@@ -306,29 +177,7 @@
     "npcs": [],
     "drops": [],
     "shops": [],
-    "unlocks": [],
-    "tasks": {
-      "Easy": {
-        "count": 5,
-        "points": 50
-      },
-      "Medium": {
-        "count": 23,
-        "points": 1150
-      },
-      "Hard": {
-        "count": 8,
-        "points": 1200
-      },
-      "Elite": {
-        "count": 11,
-        "points": 2750
-      },
-      "Master": {
-        "count": 6,
-        "points": 3000
-      }
-    }
+    "unlocks": []
   },
   "SUNSET_OCEAN": {
     "quests": [],
@@ -338,8 +187,7 @@
     "npcs": [],
     "drops": [],
     "shops": [],
-    "unlocks": [],
-    "tasks": {}
+    "unlocks": []
   },
   "FORGOTTEN_OCEAN": {
     "quests": [],
@@ -349,8 +197,7 @@
     "npcs": [],
     "drops": [],
     "shops": [],
-    "unlocks": [],
-    "tasks": {}
+    "unlocks": []
   },
   "WESTERN_OCEAN": {
     "quests": [],
@@ -360,8 +207,7 @@
     "npcs": [],
     "drops": [],
     "shops": [],
-    "unlocks": [],
-    "tasks": {}
+    "unlocks": []
   },
   "NORTHERN_OCEAN": {
     "quests": [],
@@ -371,8 +217,7 @@
     "npcs": [],
     "drops": [],
     "shops": [],
-    "unlocks": [],
-    "tasks": {}
+    "unlocks": []
   },
   "SHROUDED_OCEAN": {
     "quests": [],
@@ -382,8 +227,7 @@
     "npcs": [],
     "drops": [],
     "shops": [],
-    "unlocks": [],
-    "tasks": {}
+    "unlocks": []
   },
   "ARDENT_OCEAN": {
     "quests": [],
@@ -393,8 +237,7 @@
     "npcs": [],
     "drops": [],
     "shops": [],
-    "unlocks": [],
-    "tasks": {}
+    "unlocks": []
   },
   "UNQUIET_OCEAN": {
     "quests": [],
@@ -404,8 +247,7 @@
     "npcs": [],
     "drops": [],
     "shops": [],
-    "unlocks": [],
-    "tasks": {}
+    "unlocks": []
   },
   "EASTERN_OCEAN": {
     "quests": [],
@@ -415,8 +257,7 @@
     "npcs": [],
     "drops": [],
     "shops": [],
-    "unlocks": [],
-    "tasks": {}
+    "unlocks": []
   },
   "UNTAMED_OCEAN": {
     "quests": [],
@@ -426,7 +267,6 @@
     "npcs": [],
     "drops": [],
     "shops": [],
-    "unlocks": [],
-    "tasks": {}
+    "unlocks": []
   }
 }

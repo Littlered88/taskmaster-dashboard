@@ -30,6 +30,7 @@ initSplashScreen();
 
 // --- WebSocket Setup ---
 const socket = new WebSocket("ws://localhost:7071");
+const TIER_POINTS = { EASY: 10, MEDIUM: 50, HARD: 100, ELITE: 250, MASTER: 500 };
 
 // Global state cache to support filtering
 let globalTaskList = [];
@@ -943,7 +944,7 @@ function formatRegionName(regionId) {
     .join(" ");
 }
 
-const REGION_MAP_SVG = `<svg id="region-map-svg" viewBox="0 0 2400 1610" xmlns="http://www.w3.org/2000/svg">
+const REGION_MAP_SVG = `<svg id="region-map-svg" viewBox="0 120 2400 1610" xmlns="http://www.w3.org/2000/svg">
 <rect id="map-border"
       x="20" y="140" width="2360" height="1440"
       fill="rgba(255,255,255,0.04)"
@@ -1243,6 +1244,9 @@ function showRegionInfo(el) {
   const canAfford = globalAvailablePoints >= cost;
   const info = globalRegionInfo[catalogueId] || {};
 
+  const taskDist = getRegionTaskDistribution(catalogueId);
+  const hasTasks = Object.keys(taskDist).length > 0;
+
   document.getElementById("region-info-empty").style.display = "none";
   const content = document.getElementById("region-info-content");
   content.style.display = "block";
@@ -1256,14 +1260,14 @@ function showRegionInfo(el) {
 
   // Quick stat pills
   const pills = [];
-  if (info.tasks && Object.keys(info.tasks).length) {
-    const totalTasks = Object.values(info.tasks).reduce((s, t) => s + t.count, 0);
-    const totalPts = Object.values(info.tasks).reduce((s, t) => s + t.points, 0);
+  if (hasTasks) {
+    const totalTasks = Object.values(taskDist).reduce((s, t) => s + t.count, 0);
+    const totalPts = Object.values(taskDist).reduce((s, t) => s + t.points, 0);
     pills.push(`${totalTasks} tasks`);
     pills.push(`${Math.round(totalPts / 1000)}k pts`);
   }
-  if (info.quests && info.quests.length) pills.push(`${info.quests.length} quests`);
-  if (info.bosses && info.bosses.length) pills.push(`${info.bosses.length} bosses`);
+  if (sectionCount(info.quests)) pills.push(`${sectionCount(info.quests)} quests`);
+  if (sectionCount(info.bosses)) pills.push(`${sectionCount(info.bosses)} bosses`);
   document.getElementById("region-info-pills").innerHTML = pills
     .map((p) => `<span class="region-info-pill">${p}</span>`)
     .join("");
@@ -1296,25 +1300,25 @@ function showRegionInfo(el) {
 
   // Overview tab
   const ov = [];
-  if (info.tasks && Object.keys(info.tasks).length) ov.push(buildDistributionBar(info.tasks));
-  if (info.settlements && info.settlements.length) ov.push(buildTagSection("Settlements", info.settlements));
-  if (info.quests && info.quests.length) ov.push(buildTagSection("Completable quests", info.quests, "quest"));
-  if (info.npcs && info.npcs.length) ov.push(buildTagSection("Notable NPCs", info.npcs));
+  if (hasTasks) ov.push(buildDistributionBar(taskDist));
+  if (sectionCount(info.settlements)) ov.push(buildTagSection("Settlements", info.settlements));
+  if (sectionCount(info.quests)) ov.push(buildTagSection("Completable quests", info.quests, "quest"));
+  if (sectionCount(info.npcs)) ov.push(buildTagSection("Notable NPCs", info.npcs));
   if (!ov.length) ov.push('<p class="region-info-placeholder">No overview data available yet.</p>');
   document.getElementById("region-tab-overview").innerHTML = ov.join("");
 
   // Content tab
   const ct = [];
-  if (info.bosses && info.bosses.length) ct.push(buildTagSection("Bosses", info.bosses, "boss"));
-  if (info.skilling && info.skilling.length) ct.push(buildTagSection("Skilling activities", info.skilling, "skill"));
-  if (info.drops && info.drops.length) ct.push(buildTagSection("Notable drops", info.drops));
+  if (sectionCount(info.bosses)) ct.push(buildTagSection("Bosses", info.bosses, "boss"));
+  if (sectionCount(info.skilling)) ct.push(buildTagSection("Skilling activities", info.skilling, "skill"));
+  if (sectionCount(info.drops)) ct.push(buildTagSection("Notable drops", info.drops));
   if (!ct.length) ct.push('<p class="region-info-placeholder">No content data available yet.</p>');
   document.getElementById("region-tab-content").innerHTML = ct.join("");
 
   // Unlocks tab
   const ul = [];
-  if (info.shops && info.shops.length) ul.push(buildTagSection("Shops & guilds", info.shops));
-  if (info.unlocks && info.unlocks.length) ul.push(buildTagSection("Notable unlocks", info.unlocks));
+  if (sectionCount(info.shops)) ul.push(buildTagSection("Shops & guilds", info.shops));
+  if (sectionCount(info.unlocks)) ul.push(buildTagSection("Notable unlocks", info.unlocks));
   if (!ul.length) ul.push('<p class="region-info-placeholder">No unlock data available yet.</p>');
   document.getElementById("region-tab-unlocks").innerHTML = ul.join("");
 }
@@ -1328,12 +1332,62 @@ function switchRegionTab(el, tabId) {
   });
 }
 
-function buildTagSection(title, items, cls) {
-  const tags = items.map((item) => `<span class="region-tag${cls ? " " + cls : ""}">${item}</span>`).join("");
+function buildWikiUrl(name) {
+  return "https://oldschool.runescape.wiki/w/" + name.trim().replace(/ /g, "_");
+}
+
+function sectionCount(section) {
+  if (!section) return 0;
+  if (Array.isArray(section)) return section.length;
+  return section.items ? section.items.length : 0;
+}
+
+function buildTagSection(title, sectionData, tagClass) {
+  // Support both legacy plain arrays and new { wikiLinks, items } format
+  let items, wikiLinks;
+  if (Array.isArray(sectionData)) {
+    items = sectionData;
+    wikiLinks = false;
+  } else {
+    items = sectionData.items || [];
+    wikiLinks = sectionData.wikiLinks !== false;
+  }
+
+  if (!items.length) return "";
+
+  const cls = tagClass ? ` ${tagClass}` : "";
+
+  const tags = items
+    .map((item) => {
+      const name = typeof item === "string" ? item : item.name;
+      const hasUrlOverride = typeof item === "object" && item.hasOwnProperty("url");
+      const url = hasUrlOverride ? item.url : wikiLinks ? buildWikiUrl(name) : null;
+
+      if (url) {
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer"
+                 class="region-tag${cls} wiki-link">${name}</a>`;
+      }
+      return `<span class="region-tag${cls}">${name}</span>`;
+    })
+    .join("");
+
   return `<div class="region-info-section">
     <div class="region-info-section-label">${title}</div>
     <div class="region-tag-list">${tags}</div>
   </div>`;
+}
+
+function getRegionTaskDistribution(catalogueId) {
+  const tierOrder = ["EASY", "MEDIUM", "HARD", "ELITE", "MASTER"];
+  const result = {};
+  tierOrder.forEach((tier) => {
+    const count = globalTaskList.filter((t) => t.region === catalogueId && t.tier === tier).length;
+    if (count > 0) {
+      const key = tier.charAt(0) + tier.slice(1).toLowerCase();
+      result[key] = { count, points: count * TIER_POINTS[tier] };
+    }
+  });
+  return result;
 }
 
 function buildDistributionBar(tasks) {
