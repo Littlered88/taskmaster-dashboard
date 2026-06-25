@@ -37,6 +37,7 @@ let globalTaskList = [];
 let globalCompletedIds = [];
 let globalProgress = {};
 let globalPinnedIds = [];
+let globalRegionTaskSummary = {};
 
 // Shop/unlocks state. The catalogue (allUnlocks) is only ever sent once,
 // on connect — ownership changes after that arrive as small targeted
@@ -172,6 +173,7 @@ function updateDashboard(data) {
   globalTaskList = data.availableTasks || [];
   globalCompletedIds = data.completedTaskIds || [];
   globalProgress = data.currentTaskProgress || {};
+  globalRegionTaskSummary = data.regionTaskSummary || {};
 
   // 2. Populate the Tasks page summary cards (only present while the
   // Tasks fragment is loaded — guarded since other views don't have
@@ -1379,15 +1381,30 @@ function buildTagSection(title, sectionData, tagClass) {
 
 function getRegionTaskDistribution(catalogueId) {
   const tierOrder = ["EASY", "MEDIUM", "HARD", "ELITE", "MASTER"];
-  const result = {};
+
+  // Try live task list first (owned regions — account-type accurate)
+  const fromList = {};
   tierOrder.forEach((tier) => {
     const count = globalTaskList.filter((t) => t.region === catalogueId && t.tier === tier).length;
     if (count > 0) {
       const key = tier.charAt(0) + tier.slice(1).toLowerCase();
-      result[key] = { count, points: count * TIER_POINTS[tier] };
+      fromList[key] = { count, points: count * TIER_POINTS[tier] };
     }
   });
-  return result;
+  if (Object.keys(fromList).length > 0) return fromList;
+
+  // Fall back to plugin summary for unowned regions
+  const summary = globalRegionTaskSummary[catalogueId];
+  if (!summary) return {};
+  const fromSummary = {};
+  tierOrder.forEach((tier) => {
+    const count = summary[tier] || 0;
+    if (count > 0) {
+      const key = tier.charAt(0) + tier.slice(1).toLowerCase();
+      fromSummary[key] = { count, points: count * TIER_POINTS[tier] };
+    }
+  });
+  return fromSummary;
 }
 
 function buildDistributionBar(tasks) {
