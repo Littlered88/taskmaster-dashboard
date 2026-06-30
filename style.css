@@ -1435,3 +1435,13 @@ body.loaded {
   filter: brightness(1.25);
   border-color: rgba(255, 255, 255, 0.3);
 }
+
+.todo-content { padding: 8px 0; max-width: 800px; }
+.todo-content h1 { font-size: 22px; color: var(--accent-gold); margin: 24px 0 8px; }
+.todo-content h2 { font-size: 18px; color: var(--accent-gold); margin: 20px 0 8px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 4px; }
+.todo-content h3 { font-size: 15px; color: var(--text-main); margin: 14px 0 4px; }
+.todo-content ul { margin: 0 0 8px 20px; padding: 0; }
+.todo-content li { color: var(--text-muted); font-size: 13px; line-height: 1.6; margin-bottom: 3px; }
+.todo-content p { color: var(--text-muted); font-size: 13px; line-height: 1.6; }
+.todo-content del { color: #555; }
+.todo-loading { color: var(--text-muted); font-size: 13px; }

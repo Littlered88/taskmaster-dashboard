@@ -115,6 +115,8 @@ async function loadViews() {
     })
     .catch(() => {});
 
+  loadTodoList();
+
   viewsReady = true;
   document.body.classList.add("loaded");
 
@@ -1506,4 +1508,71 @@ function buildWaterMask() {
   // Apply mask to the ocean layer group
   const oceanLayer = document.getElementById("ocean-layer");
   if (oceanLayer) oceanLayer.setAttribute("mask", "url(#water-only)");
+}
+
+function renderTodoMarkdown(md) {
+  const lines = md.split("\n");
+  let html = "";
+  let inList = false;
+
+  for (let raw of lines) {
+    let line = raw.trim();
+
+    if (line === "") {
+      if (inList) {
+        html += "</ul>";
+        inList = false;
+      }
+      continue;
+    }
+
+    // Headers
+    let headerMatch = line.match(/^(#{1,3})\s+(.*)/);
+    if (headerMatch) {
+      if (inList) {
+        html += "</ul>";
+        inList = false;
+      }
+      const level = headerMatch[1].length;
+      html += `<h${level}>${inlineMd(headerMatch[2])}</h${level}>`;
+      continue;
+    }
+
+    // List items (handles leading "- " with optional indent)
+    let listMatch = line.match(/^-\s+(.*)/);
+    if (listMatch) {
+      if (!inList) {
+        html += "<ul>";
+        inList = true;
+      }
+      html += `<li>${inlineMd(listMatch[1])}</li>`;
+      continue;
+    }
+
+    // Plain paragraph
+    if (inList) {
+      html += "</ul>";
+      inList = false;
+    }
+    html += `<p>${inlineMd(line)}</p>`;
+  }
+  if (inList) html += "</ul>";
+  return html;
+}
+
+function inlineMd(text) {
+  return text.replace(/~~(.*?)~~/g, "<del>$1</del>").replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+}
+
+function loadTodoList() {
+  const container = document.getElementById("todo-content");
+  if (!container) return;
+  fetch("Taskmaster_TODO_List.md")
+    .then((r) => r.text())
+    .then((md) => {
+      container.innerHTML = renderTodoMarkdown(md);
+    })
+    .catch(() => {
+      container.innerHTML = '<p class="todo-loading">Could not load TODO list.</p>';
+    });
 }
