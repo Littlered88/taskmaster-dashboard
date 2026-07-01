@@ -1,23 +1,30 @@
 # Taskmaster — TODO List
 
 ## In Progress
+
 - Task data population — remaining regions to complete:
   - ~~Kharidian Desert~~ ✅ Complete
   - ~~Fremennik Province~~ ✅ Complete
   - ~~Great Kourend~~ ✅ Complete (4 tasks pending verification on higher-level account)
   - ~~Morytania~~ ✅ Complete
-  - Tirannwn — first pass complete, pending Dean's review
-  - Varlamore — trackers actively being added
+  - ~~Tirannwn~~ ✅ Complete
+  - ~~Varlamore~~ ✅ Complete
   - Wilderness — first pass complete, pending Dean's review
   - Misthalin (file does not exist yet)
   - Ocean files (Ardent, Shrouded, Western, Northern, Sunset, Unquiet — files do not exist yet)
 
 ## Dashboard Features
+
 - **Stats screen** — design and implement the stats/progress page on the dashboard
-- **Settings page** — full settings page on the dashboard covering account type,
-  difficulty, starting region, and any other configurable options. Note: distinct
-  from the existing first-run setup wizard; this provides ongoing access to config
-  after setup is complete
+- ~~Settings page~~ — discussed and shelved. Account info is read-only and
+  already covered by the Stats page pills; dashboard-only preferences (demo mode,
+  default tab etc.) don't bring enough value yet to justify a dedicated page —
+  revisit in LTS. A "clear dashboard cache" action was also considered and
+  deferred for the same reason. Danger Zone actions (reset progress, unmark
+  tasks) were ruled out as a dashboard feature entirely — unmarking will be
+  dev-mode gated and inaccessible to users, and manual task completion will be
+  a per-task eligibility flag surfaced in the task detail modal (for tasks like
+  one-off quests where auto-completion can fail), not a blanket admin action
 - **First-run setup options on dashboard** — move account type, difficulty and
   starting region display to the dashboard. Config options currently locked after
   setup (partially overlaps with settings page above — consider consolidating)
@@ -38,10 +45,22 @@
   with an active user base; approach RuneLite with usage data to support the request
 
 ## Plugin Hub Submission Prep
+
 - **WebSocket toggle** — add a boolean config option in `TaskmasterConfig.java`
   to enable/disable the WebSocket server. Plugin should listen for config changes
   via `onConfigChanged` to start/stop the server dynamically without requiring a
   client restart
+- **Configurable WebSocket port** — port 7071 is currently hardcoded. If another
+  application is already using that port the dashboard silently fails to connect
+  with no workaround. Add a config option to let the user change it
+- **Chat notification toggle** — six distinct `sendGameMessage()` call sites
+  (unlocks loaded, insufficient points, purchase success, region unlocked, task
+  completed, task unmarked) with no way to silence them. Could get noisy when
+  multiple tasks complete in quick succession from a single tracker event. Add a
+  `showChatNotifications` boolean
+- **"AREA LOCKED" overlay visibility** — `TaskmasterScreenOverlay` always renders
+  with no explicit toggle. RuneLite's built-in per-overlay right-click hide may
+  already cover this — verify in-game before treating it as a real gap
 - **Config description for WebSocket** — add a clear description to the WebSocket
   config option explaining that the server runs locally on localhost:7071 and that
   no player data is sent to any external server. The GitHub Pages dashboard only
@@ -50,6 +69,7 @@
   AGENTS.md before submitting and ensure no remaining violations
 
 ## Balancing
+
 - **Review all unlock JSON files** — go through shops, guilds, bosses, minigames,
   storage, raids, skilling, transportation, and islands JSON files and verify
   entries are correct, complete, and consistently formatted
@@ -79,6 +99,7 @@
     revisit once playtesting is possible
 
 ## Pending Features
+
 - **Account type task filtering** — filter tasks based on selected account type
   (MAIN, IRONMAN, UIM etc.). Model is in place, implementation pending
 - **Region unlock cost formula** — replace the placeholder linear formula in
@@ -90,6 +111,7 @@
   deduplication logic. Defer until post-release
 
 ## Technical Debt
+
 - **Task card horizontal overflow** — task cards in the side panel expand beyond
   available width. Previous fix attempts caused tasks to disappear. Needs fresh
   investigation
@@ -124,6 +146,7 @@
   any existing tasks before removing/restructuring
 
 ## Completed
+
 - ✅ Persistence layer refactor — atomic JSON save data
 - ✅ Region selection dialog — replaced JOptionPane with proper UI
 - ✅ Replace Javalin with Java-WebSocket + GitHub Pages
