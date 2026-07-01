@@ -1,32 +1,63 @@
-    <div class="section-header">
-        <h3>Detailed Statistics</h3>
+<div class="section-header">
+  <h3>Detailed Statistics</h3>
+</div>
+
+<div class="account-pills" id="account-pills"></div>
+
+<div class="challenge-day-banner" id="challenge-day-banner">
+  <span class="challenge-day-label">Day</span>
+  <span class="challenge-day-value" id="challenge-day-value">—</span>
+  <span class="challenge-day-label">of your challenge</span>
+</div>
+
+<div class="summary-bar" id="stats-summary-grid">
+  <div class="summary-card tasks">
+    <div class="label">Tasks Completed</div>
+    <div class="value" id="stats-tasks-value">0 / 0</div>
+    <div class="sub" id="stats-tasks-sub">0% overall</div>
+  </div>
+  <div class="summary-card points">
+    <div class="label">Points Earned</div>
+    <div class="value" id="stats-earned-value">0</div>
+    <div class="sub">Lifetime total</div>
+  </div>
+  <div class="summary-card progress">
+    <div class="label">Points Spent</div>
+    <div class="value" id="stats-spent-value">0</div>
+    <div class="sub">On unlocks</div>
+  </div>
+  <div class="summary-card next">
+    <div class="label">Regions Owned</div>
+    <div class="value" id="stats-regions-value">0 / 0</div>
+    <div class="sub">Land &amp; ocean</div>
+  </div>
+</div>
+
+<div class="stats-columns">
+  <div class="stats-column">
+    <div class="stats-panel">
+      <div class="section-header"><h4>Tasks by Tier</h4></div>
+      <div id="tier-breakdown"></div>
     </div>
 
-    <div class="account-pills" id="account-pills">
-        <!-- Populated by app.js: Difficulty, Account Type, Starting Region -->
+    <div class="stats-panel lifetime-panel">
+      <div class="section-header"><h4>Lifetime Stats</h4></div>
+      <div class="lifetime-stats-grid" id="lifetime-stats-grid"></div>
     </div>
+  </div>
 
-    <div class="summary-grid" id="stats-summary-grid">
-        <!-- Populated by app.js: Tasks Completed, Points Earned, Regions Owned, Time -->
-    </div>
+  <div class="stats-panel">
+    <div class="section-header"><h4>Unlock Progress by Category</h4></div>
+    <div id="category-breakdown" class="category-chip-grid"></div>
+  </div>
 
-    <div class="stats-columns">
-        <div class="stats-panel">
-            <div class="section-header"><h4>Tasks by Tier</h4></div>
-            <div id="tier-breakdown">
-                <!-- Populated by app.js -->
-            </div>
-        </div>
+  <div class="stats-panel">
+    <div class="section-header"><h4>Region Progress</h4></div>
+    <div id="region-breakdown"></div>
+  </div>
+</div>
 
-        <div class="stats-panel">
-            <div class="section-header"><h4>Region Progress</h4></div>
-            <div id="region-breakdown">
-                <!-- Populated by app.js -->
-            </div>
-        </div>
-    </div>
-
-    <div class="section-header"><h4>Recent Activity</h4></div>
-    <div class="activity-feed" id="activity-feed">
-        <!-- Populated by app.js -->
-    </div>
+<div class="activity-feed" id="activity-feed">
+  <div class="section-header"><h4>Recent Activity</h4></div>
+  <p class="activity-placeholder">Activity tracking coming soon.</p>
+</div>

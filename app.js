@@ -31,6 +31,8 @@ initSplashScreen();
 // --- WebSocket Setup ---
 const socket = new WebSocket("ws://localhost:7071");
 const TIER_POINTS = { EASY: 10, MEDIUM: 50, HARD: 100, ELITE: 250, MASTER: 500 };
+const TIER_COLORS = { EASY: "#1e8449", MEDIUM: "#2471a3", HARD: "#d4a017", ELITE: "#c0395a", MASTER: "#6c3483" };
+const ACTIVITY_ICONS = { TASK_COMPLETED: "✅", UNLOCK_PURCHASED: "🔓" };
 
 // Global state cache to support filtering
 let globalTaskList = [];
@@ -48,6 +50,8 @@ let globalOwnedRegionIds = new Set();
 let globalAvailablePoints = 0;
 let activeShopTab = "REGIONS";
 let globalRegionInfo = {};
+let globalLastStatsPayload = null;
+let globalActivityLog = [];
 
 // Tracks whether view fragments have finished loading and are in the DOM.
 // The WebSocket can receive data before fragments finish fetching — and
@@ -172,10 +176,12 @@ function attachNavHandlers() {
 // --- Data Management & Rendering ---
 function updateDashboard(data) {
   // 1. Cache the global state
+  globalLastStatsPayload = data;
   globalTaskList = data.availableTasks || [];
   globalCompletedIds = data.completedTaskIds || [];
   globalProgress = data.currentTaskProgress || {};
   globalRegionTaskSummary = data.regionTaskSummary || {};
+  globalActivityLog = data.activityLog || [];
 
   // 2. Populate the Tasks page summary cards (only present while the
   // Tasks fragment is loaded — guarded since other views don't have
@@ -185,6 +191,9 @@ function updateDashboard(data) {
 
   // 3. Render Tasks
   filterTasks();
+
+  // 4. Render Stats page
+  renderStatsPage(data);
 }
 
 function updateTasksSummaryCards(availablePoints, completionPercentage) {
@@ -605,6 +614,8 @@ function handleUnlocksCatalogue(data) {
   globalOwnedPerkIds = new Set(data.initiallyOwnedPerks || []);
   globalOwnedRegionIds = new Set(data.initiallyOwnedRegions || []);
   globalAvailablePoints = data.availablePoints || 0;
+
+  if (globalLastStatsPayload) renderStatsPage(globalLastStatsPayload);
 
   renderShopTabs();
   renderShopFilterBar();
@@ -1510,6 +1521,234 @@ function buildWaterMask() {
   if (oceanLayer) oceanLayer.setAttribute("mask", "url(#water-only)");
 }
 
+function renderStatsPage(data) {
+  const pillsEl = document.getElementById("account-pills");
+  if (!pillsEl) return;
+
+  // Account pills
+  pillsEl.innerHTML = `
+    <div class="account-pill">Difficulty: <strong>${data.difficulty}</strong></div>
+    <div class="account-pill">Account: <strong>${data.accountType}</strong></div>
+    <div class="account-pill">Starting Region: <strong>${data.startingRegion}</strong></div>
+  `;
+
+  // Challenge day counter
+  const dayEl = document.getElementById("challenge-day-value");
+  if (dayEl) {
+    if (data.challengeStartedAt && data.challengeStartedAt > 0) {
+      const daysElapsed = Math.floor((Date.now() - data.challengeStartedAt) / 86400000) + 1;
+      dayEl.innerText = daysElapsed;
+    } else {
+      dayEl.innerText = "—";
+    }
+  }
+
+  // Summary cards
+  document.getElementById("stats-tasks-value").innerText = `${globalCompletedIds.length} / ${globalTaskList.length}`;
+  document.getElementById("stats-tasks-sub").innerText = `${(data.completionPercentage || 0).toFixed(1)}% overall`;
+  document.getElementById("stats-earned-value").innerText = data.totalPointsEarned.toLocaleString();
+  document.getElementById("stats-spent-value").innerText = data.totalPointsSpent.toLocaleString();
+
+  const totalRegions = globalUnlockCatalogue.filter((u) => u.category === "REGION" || u.category === "OCEAN").length;
+  document.getElementById("stats-regions-value").innerText = `${globalOwnedRegionIds.size} / ${totalRegions}`;
+
+  renderTierBreakdown();
+  renderRegionBreakdown();
+  renderCategoryBreakdown();
+  renderTierBreakdown();
+  renderRegionBreakdown();
+  renderCategoryBreakdown();
+  renderLifetimeStats(data);
+  renderActivityFeed();
+}
+
+function renderTierBreakdown() {
+  const container = document.getElementById("tier-breakdown");
+  if (!container) return;
+
+  const tiers = ["EASY", "MEDIUM", "HARD", "ELITE", "MASTER"];
+  container.innerHTML = tiers
+    .map((tier) => {
+      const tierTasks = globalTaskList.filter((t) => t.tier === tier);
+      const total = tierTasks.length;
+      if (total === 0) return "";
+      const completed = tierTasks.filter((t) => globalCompletedIds.includes(t.id)).length;
+      const pct = (completed / total) * 100;
+      const label = tier.charAt(0) + tier.slice(1).toLowerCase();
+
+      return `
+        <div class="stat-progress-row">
+          <div class="stat-progress-label">
+            <span>${label}</span>
+            <span class="count">${completed} / ${total}</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" style="width:${pct}%;background:${TIER_COLORS[tier]}"></div>
+          </div>
+        </div>
+      `;
+    })
+    .join("");
+}
+
+function renderRegionBreakdown() {
+  const container = document.getElementById("region-breakdown");
+  if (!container) return;
+
+  const nameMap = {};
+  globalUnlockCatalogue.forEach((u) => {
+    nameMap[u.id] = u.name;
+  });
+
+  const rows = Array.from(globalOwnedRegionIds)
+    .map((regionId) => {
+      const regionTasks = globalTaskList.filter((t) => t.region === regionId);
+      const total = regionTasks.length;
+      if (total === 0) return null;
+      const completed = regionTasks.filter((t) => globalCompletedIds.includes(t.id)).length;
+      const pct = (completed / total) * 100;
+      const name = nameMap[regionId] || regionId;
+
+      return { name, completed, total, pct };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.pct - a.pct);
+
+  if (rows.length === 0) {
+    container.innerHTML = '<p class="activity-placeholder">No region task data yet.</p>';
+    return;
+  }
+
+  container.innerHTML = rows
+    .map(
+      (r) => `
+        <div class="stat-progress-row">
+          <div class="stat-progress-label">
+            <span>${r.name}</span>
+            <span class="count">${r.completed} / ${r.total}</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" style="width:${r.pct}%;background:var(--accent-blue)"></div>
+          </div>
+        </div>
+      `,
+    )
+    .join("");
+}
+
+function renderCategoryBreakdown() {
+  const container = document.getElementById("category-breakdown");
+  if (!container) return;
+
+  const excluded = ["REGION", "OCEAN"];
+
+  const categories = {};
+  globalUnlockCatalogue.forEach((u) => {
+    if (excluded.includes(u.category)) return;
+    if (!categories[u.category]) categories[u.category] = { total: 0, owned: 0 };
+    categories[u.category].total++;
+    if (globalOwnedPerkIds.has(u.id)) categories[u.category].owned++;
+  });
+
+  const rows = Object.entries(categories)
+    .map(([cat, { total, owned }]) => ({
+      name: formatCategoryName(cat),
+      owned,
+      total,
+      pct: total > 0 ? (owned / total) * 100 : 0,
+    }))
+    .sort((a, b) => b.pct - a.pct);
+
+  if (rows.length === 0) {
+    container.innerHTML = '<p class="activity-placeholder">No unlock data yet.</p>';
+    return;
+  }
+
+  container.innerHTML = rows
+    .map(
+      (r) => `
+        <div class="category-chip">
+          <div class="category-chip-name">${r.name}</div>
+          <div class="category-chip-frac">${r.owned} / ${r.total}</div>
+          <div class="mini-progress-track">
+            <div class="mini-progress-fill" style="width:${r.pct}%"></div>
+          </div>
+        </div>
+      `,
+    )
+    .join("");
+}
+
+function formatCategoryName(str) {
+  const words = str.toLowerCase().replace(/_/g, " ");
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
+function renderLifetimeStats(data) {
+  const container = document.getElementById("lifetime-stats-grid");
+  if (!container) return;
+
+  const cards = [
+    { label: "Quests completed", value: data.totalQuestsCompleted },
+    { label: "Total deaths", value: data.totalDeaths },
+    { label: "NPCs killed", value: data.totalNpcKills },
+    { label: "Bosses killed", value: data.totalBossKills },
+    { label: "Favourite boss", value: data.favouriteBoss ? `${data.favouriteBoss} (${data.favouriteBossKills})` : "—" },
+  ];
+
+  container.innerHTML = cards
+    .map(
+      (c) => `
+        <div class="lifetime-stat-card">
+          <div class="lifetime-stat-value">${c.value}</div>
+          <div class="lifetime-stat-label">${c.label}</div>
+        </div>
+      `,
+    )
+    .join("");
+}
+
+function renderActivityFeed() {
+  const container = document.getElementById("activity-feed");
+  if (!container) return;
+
+  if (!globalActivityLog || globalActivityLog.length === 0) {
+    container.innerHTML = '<p class="activity-placeholder">No activity yet.</p>';
+    return;
+  }
+
+  container.innerHTML = globalActivityLog
+    .slice(0, 15)
+    .map((entry) => {
+      const icon = ACTIVITY_ICONS[entry.type] || "•";
+      const pointsText =
+        entry.points > 0
+          ? `<span class="activity-points positive">+${entry.points} pts</span>`
+          : entry.points < 0
+            ? `<span class="activity-points negative">${entry.points} pts</span>`
+            : "";
+      return `
+        <div class="activity-row">
+          <span class="activity-icon">${icon}</span>
+          <span class="activity-label">${entry.label}</span>
+          ${pointsText}
+          <span class="activity-time">${formatTimeAgo(entry.timestamp)}</span>
+        </div>
+      `;
+    })
+    .join("");
+}
+
+function formatTimeAgo(timestamp) {
+  const diffMin = Math.floor((Date.now() - timestamp) / 60000);
+  if (diffMin < 1) return "Just now";
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHr = Math.floor(diffMin / 60);
+  if (diffHr < 24) return `${diffHr}h ago`;
+  return `${Math.floor(diffHr / 24)}d ago`;
+}
+
+//TODO - TODO page will be deleted when active dev is complete, to be replaced with Roadmap page
 function renderTodoMarkdown(md) {
   const lines = md.split("\n");
   let html = "";
