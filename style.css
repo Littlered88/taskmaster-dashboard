@@ -1552,6 +1552,75 @@ body.loaded {
   white-space: nowrap;
 }
 
+.activity-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.view-all-btn {
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition:
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.view-all-btn:hover {
+  color: var(--text-main);
+  border-color: var(--accent-blue);
+}
+
+.view-all-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.load-more-btn {
+  background: var(--bg-hover);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  border-radius: 6px;
+  padding: 8px 20px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.load-more-btn:hover {
+  border-color: var(--accent-blue);
+}
+
+.region-progress-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 12px;
+}
+
+.region-progress-tab {
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition:
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.region-progress-tab:hover {
+  color: var(--text-main);
+}
+
+.region-progress-tab.active {
+  color: var(--accent-blue);
+  border-bottom-color: var(--accent-blue);
+}
+
 .challenge-day-banner {
   background: linear-gradient(135deg, var(--bg-panel), var(--bg-hover));
   border: 1px solid var(--border-subtle);

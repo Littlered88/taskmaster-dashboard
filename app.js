@@ -52,6 +52,8 @@ let activeShopTab = "REGIONS";
 let globalRegionInfo = {};
 let globalLastStatsPayload = null;
 let globalActivityLog = [];
+let activityModalPageSize = 50;
+let activityModalVisibleCount = 0;
 
 // Tracks whether view fragments have finished loading and are in the DOM.
 // The WebSocket can receive data before fragments finish fetching — and
@@ -83,6 +85,12 @@ function routeIncomingMessage(data) {
       break;
     case "PURCHASE_FAILED":
       handlePurchaseFailed(data);
+      break;
+    case "ACTIVITY_LOG_ENTRY":
+      handleActivityLogEntry(data);
+      break;
+    case "ACTIVITY_LOG_PAGE":
+      handleActivityLogPage(data);
       break;
     default:
       // STATS payload (or older payloads without the field yet)
@@ -1592,48 +1600,67 @@ function renderTierBreakdown() {
 }
 
 function renderRegionBreakdown() {
-  const container = document.getElementById("region-breakdown");
-  if (!container) return;
+  const landContainer = document.getElementById("region-breakdown-land");
+  const oceanContainer = document.getElementById("region-breakdown-ocean");
+  if (!landContainer || !oceanContainer) return;
 
+  const categoryById = {};
+  globalUnlockCatalogue.forEach((u) => {
+    categoryById[u.id] = u.category;
+  });
   const nameMap = {};
   globalUnlockCatalogue.forEach((u) => {
     nameMap[u.id] = u.name;
   });
 
-  const rows = Array.from(globalOwnedRegionIds)
-    .map((regionId) => {
-      const regionTasks = globalTaskList.filter((t) => t.region === regionId);
-      const total = regionTasks.length;
-      if (total === 0) return null;
-      const completed = regionTasks.filter((t) => globalCompletedIds.includes(t.id)).length;
-      const pct = (completed / total) * 100;
-      const name = nameMap[regionId] || regionId;
+  const buildRows = (wantedCategory) =>
+    Array.from(globalOwnedRegionIds)
+      .filter((id) => categoryById[id] === wantedCategory)
+      .map((regionId) => {
+        const regionTasks = globalTaskList.filter((t) => t.region === regionId);
+        const total = regionTasks.length;
+        if (total === 0) return null;
+        const completed = regionTasks.filter((t) => globalCompletedIds.includes(t.id)).length;
+        return {
+          name: nameMap[regionId] || regionId,
+          completed,
+          total,
+          pct: (completed / total) * 100,
+        };
+      })
+      .filter(Boolean)
+      .sort((a, b) => b.pct - a.pct);
 
-      return { name, completed, total, pct };
-    })
-    .filter(Boolean)
-    .sort((a, b) => b.pct - a.pct);
-
-  if (rows.length === 0) {
-    container.innerHTML = '<p class="activity-placeholder">No region task data yet.</p>';
-    return;
-  }
-
-  container.innerHTML = rows
-    .map(
-      (r) => `
-        <div class="stat-progress-row">
-          <div class="stat-progress-label">
-            <span>${r.name}</span>
-            <span class="count">${r.completed} / ${r.total}</span>
+  const renderRows = (rows) => {
+    if (rows.length === 0) {
+      return '<p class="activity-placeholder">No task data yet.</p>';
+    }
+    return rows
+      .map(
+        (r) => `
+          <div class="stat-progress-row">
+            <div class="stat-progress-label">
+              <span>${r.name}</span>
+              <span class="count">${r.completed} / ${r.total}</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" style="width:${r.pct}%;background:var(--accent-blue)"></div>
+            </div>
           </div>
-          <div class="progress-track">
-            <div class="progress-fill" style="width:${r.pct}%;background:var(--accent-blue)"></div>
-          </div>
-        </div>
-      `,
-    )
-    .join("");
+        `,
+      )
+      .join("");
+  };
+
+  landContainer.innerHTML = renderRows(buildRows("REGION"));
+  oceanContainer.innerHTML = renderRows(buildRows("OCEAN"));
+}
+
+function switchRegionProgressTab(el, tab) {
+  document.querySelectorAll(".region-progress-tab").forEach((t) => t.classList.remove("active"));
+  el.classList.add("active");
+  document.getElementById("region-breakdown-land").style.display = tab === "land" ? "" : "none";
+  document.getElementById("region-breakdown-ocean").style.display = tab === "ocean" ? "" : "none";
 }
 
 function renderCategoryBreakdown() {
@@ -1712,31 +1739,87 @@ function renderActivityFeed() {
   const container = document.getElementById("activity-feed");
   if (!container) return;
 
+  const viewAllBtn = document.getElementById("activity-view-all-btn");
+
   if (!globalActivityLog || globalActivityLog.length === 0) {
     container.innerHTML = '<p class="activity-placeholder">No activity yet.</p>';
+    if (viewAllBtn) viewAllBtn.style.display = "none";
     return;
   }
 
-  container.innerHTML = globalActivityLog
-    .slice(0, 15)
-    .map((entry) => {
-      const icon = ACTIVITY_ICONS[entry.type] || "•";
-      const pointsText =
-        entry.points > 0
-          ? `<span class="activity-points positive">+${entry.points} pts</span>`
-          : entry.points < 0
-            ? `<span class="activity-points negative">${entry.points} pts</span>`
-            : "";
-      return `
-        <div class="activity-row">
-          <span class="activity-icon">${icon}</span>
-          <span class="activity-label">${entry.label}</span>
-          ${pointsText}
-          <span class="activity-time">${formatTimeAgo(entry.timestamp)}</span>
-        </div>
-      `;
-    })
-    .join("");
+  container.innerHTML = globalActivityLog.slice(0, 15).map(renderActivityRow).join("");
+
+  if (viewAllBtn) {
+    viewAllBtn.style.display = globalActivityLog.length > 15 ? "" : "none";
+  }
+}
+
+function openActivityModal() {
+  activityModalEntries = [...globalActivityLog]; // start with what's already in memory
+  activityModalOldestTimestamp =
+    globalActivityLog.length > 0 ? globalActivityLog[globalActivityLog.length - 1].timestamp : null;
+  activityModalHasMore = globalActivityLog.length >= 50;
+
+  renderActivityModalList();
+  document.getElementById("activity-modal").classList.add("active");
+}
+
+function closeActivityModal(event) {
+  if (event && event.target.id !== "activity-modal") return;
+  document.getElementById("activity-modal").classList.remove("active");
+  document.getElementById("activity-modal-list").innerHTML = "";
+  document.getElementById("activity-modal-footer").innerHTML = "";
+  activityModalEntries = [];
+}
+
+function renderActivityModalList() {
+  const listEl = document.getElementById("activity-modal-list");
+  const footerEl = document.getElementById("activity-modal-footer");
+
+  if (activityModalEntries.length === 0) {
+    listEl.innerHTML = '<p class="activity-placeholder">No activity yet.</p>';
+    footerEl.innerHTML = "";
+    return;
+  }
+
+  listEl.innerHTML = activityModalEntries.map(renderActivityRow).join("");
+
+  footerEl.innerHTML = activityModalHasMore
+    ? `<button class="load-more-btn" onclick="loadMoreActivity()">View more…</button>`
+    : `<p class="activity-placeholder" style="padding:8px 0;margin:0">— Start of your journey —</p>`;
+}
+
+function loadMoreActivity() {
+  sendGetActivityLogPage(activityModalOldestTimestamp);
+}
+
+function sendGetActivityLogPage(beforeTimestamp) {
+  const payload = {
+    action: "GET_ACTIVITY_LOG",
+    before: beforeTimestamp,
+  };
+
+  if (socket.readyState === WebSocket.OPEN) {
+    socket.send(JSON.stringify(payload));
+  }
+}
+
+function renderActivityRow(entry) {
+  const icon = ACTIVITY_ICONS[entry.type] || "•";
+  const pointsText =
+    entry.points > 0
+      ? `<span class="activity-points positive">+${entry.points} pts</span>`
+      : entry.points < 0
+        ? `<span class="activity-points negative">${entry.points} pts</span>`
+        : "";
+  return `
+    <div class="activity-row">
+      <span class="activity-icon">${icon}</span>
+      <span class="activity-label">${entry.label}</span>
+      ${pointsText}
+      <span class="activity-time">${formatTimeAgo(entry.timestamp)}</span>
+    </div>
+  `;
 }
 
 function formatTimeAgo(timestamp) {
@@ -1746,6 +1829,38 @@ function formatTimeAgo(timestamp) {
   const diffHr = Math.floor(diffMin / 60);
   if (diffHr < 24) return `${diffHr}h ago`;
   return `${Math.floor(diffHr / 24)}d ago`;
+}
+
+function handleActivityLogEntry(data) {
+  if (!data.entry) return;
+  globalActivityLog.unshift(data.entry);
+  if (globalActivityLog.length > 50) globalActivityLog.pop();
+
+  renderActivityFeed();
+
+  // If the modal is open, prepend live too
+  const modal = document.getElementById("activity-modal");
+  if (modal && modal.classList.contains("active")) {
+    const listEl = document.getElementById("activity-modal-list");
+    if (listEl) listEl.insertAdjacentHTML("afterbegin", renderActivityRow(data.entry));
+  }
+}
+
+let activityModalEntries = []; // full accumulated set shown in the modal (separate from the 50-entry rolling globalActivityLog)
+let activityModalOldestTimestamp = null;
+let activityModalHasMore = true;
+
+function handleActivityLogPage(data) {
+  const entries = data.entries || [];
+
+  if (entries.length < 50) activityModalHasMore = false;
+
+  activityModalEntries = activityModalEntries.concat(entries);
+  if (entries.length > 0) {
+    activityModalOldestTimestamp = entries[entries.length - 1].timestamp;
+  }
+
+  renderActivityModalList();
 }
 
 //TODO - TODO page will be deleted when active dev is complete, to be replaced with Roadmap page

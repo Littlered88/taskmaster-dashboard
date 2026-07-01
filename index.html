@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
-    <link rel="icon" type="image/png" href="assets/taskmaster_icon.png">
+    <link rel="icon" type="image/png" href="assets/taskmaster_icon.png" />
     <title>Taskmaster Dashboard</title>
   </head>
   <body>
@@ -84,6 +84,20 @@
           <div id="modal-requirements" class="modal-requirements"></div>
         </div>
         <div class="modal-footer" id="modal-footer"></div>
+      </div>
+    </div>
+    <div id="activity-modal" class="modal-overlay" onclick="closeActivityModal(event)">
+      <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 640px">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <h3>Activity Log</h3>
+          </div>
+          <button class="btn-close" onclick="closeActivityModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div id="activity-modal-list" class="activity-feed" style="max-height: 60vh"></div>
+        </div>
+        <div class="modal-footer" id="activity-modal-footer" style="justify-content: center"></div>
       </div>
     </div>
 

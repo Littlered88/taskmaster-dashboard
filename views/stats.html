@@ -53,11 +53,21 @@
 
   <div class="stats-panel">
     <div class="section-header"><h4>Region Progress</h4></div>
-    <div id="region-breakdown"></div>
+    <div class="region-progress-tabs">
+      <div class="region-progress-tab active" onclick="switchRegionProgressTab(this, 'land')">Land</div>
+      <div class="region-progress-tab" onclick="switchRegionProgressTab(this, 'ocean')">Ocean</div>
+    </div>
+    <div id="region-breakdown-land"></div>
+    <div id="region-breakdown-ocean" style="display: none"></div>
   </div>
 </div>
 
-<div class="activity-feed" id="activity-feed">
-  <div class="section-header"><h4>Recent Activity</h4></div>
-  <p class="activity-placeholder">Activity tracking coming soon.</p>
+<div class="stats-panel">
+  <div class="section-header activity-header">
+    <h4>Recent Activity</h4>
+    <button class="view-all-btn" id="activity-view-all-btn" onclick="openActivityModal()">View All</button>
+  </div>
+  <div class="activity-feed" id="activity-feed">
+    <p class="activity-placeholder">Activity tracking coming soon.</p>
+  </div>
 </div>
